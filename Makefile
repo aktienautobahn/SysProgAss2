@@ -39,7 +39,7 @@ all: $(TEST_TARGET)
 
 # Rule for compiling test source files into test targets
 $(BUILD_DIR)/%: $(TEST_DIR)/%.c $(OBJS) | $(BUILD_DIR) 
-	ASAN_OPTIONS=detect_leaks=1 $(CC) $(CFLAGS) $(OBJS) $< -o $@
+	$(CC) $(CFLAGS) $(OBJS) $< -o $@
 
 # Rule for compiling source files into object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)

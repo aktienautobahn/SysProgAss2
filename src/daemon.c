@@ -139,16 +139,6 @@ int malicious_filter(unsigned char* unfiltered_string, size_t contents_len) {
             }
         }
     }
-    // while(unfiltered_string[unfiltered_index] != '\0') { // traverse the string
-    //     if (unfiltered_string[unfiltered_index] == malstring[malcounter]) {
-    //         malcounter++; // increment malstring counter
-    //         if (malcounter == malstring_len) {
-    //             // printf("Malicious found\n");
-    //             return 1; // all characters found in sequence
-    //         }
-    //     }
-    //     unfiltered_index++; // increment index of unfiltered string
-    // }
     return 0; // no malicious pattern found
 }
 
@@ -165,7 +155,7 @@ int malicious_filter(unsigned char* unfiltered_string, size_t contents_len) {
  * @return int Returns 1 if any of the specified conditions are met, otherwise returns 0.
  */
 int port_filter(int from, int to) {
-    if (from == to || from == 42 || to == 42 || from + to == 42) { // TODO add them back  
+    if (from == to || from == 42 || to == 42 || from + to == 42) { 
         return 1;
     }
     return 0; // if neither of conditions is true
@@ -233,7 +223,7 @@ void* read_packets(void* arg) {
     rbctx_t* ctx = thread_args->ctx;
     connection_r* conn = thread_args->conn; 
 
-    /* read ringbuffer in chunks and write to file  ? with / or without random delay */
+    /* read ringbuffer in chunks and write to file with delay 10 us */
     unsigned char buf[MESSAGE_SIZE + 3 * sizeof(size_t)];
     size_t buffer_len = sizeof(buf);
     size_t packet_id = 0;
@@ -263,7 +253,6 @@ void* read_packets(void* arg) {
             pthread_mutex_lock(&port_array[conn->from_port].mutex);
 
             while (packet_id != port_array[conn->from_port].last_packet_id + 1) {
-                // printf("packet id is on hold: %zu\n", packet_id);
                 pthread_cond_wait(&port_array[conn->from_port].signal, &port_array[conn->from_port].mutex);
             }
             // update packet id
@@ -271,51 +260,22 @@ void* read_packets(void* arg) {
 
             // firewall: filter on port and "malicious" and decide if drop the message or not, if not , write to the file 
             if (firewall(conn, contents, buffer_len - 3 * sizeof(size_t)) == 0) {
-
-                // Debug: Log the packet information
-                char debug_filename[32];
-                snprintf(debug_filename, sizeof(debug_filename), "%zu_debug.txt", conn->to_port);
-                FILE *debug_fp = fopen(debug_filename, "a");
-                if (debug_fp != NULL) {
-                    fprintf(debug_fp, "%zu %zu %zu %s\n", conn->from_port, conn->to_port, packet_id, contents);
-                    fclose(debug_fp);
-                } else {
-                    fprintf(stderr, "Cannot open debug file with name %s\n", debug_filename);
-                }
-                
                 size_t write = forwarding(conn, // meta information: ports
                                         &contents,  // buffer (contents)
-                                        (buffer_len - 3 * sizeof(size_t)) // buffer length
-                                        );
+                                        (buffer_len - 3 * sizeof(size_t))); // buffer length
                 if (write != buffer_len - 3 * sizeof(size_t)) {
                     // an error occured
                     fprintf(stderr, "Error with forwarding\n");
                 }
-            } else {
-              // Debug: Log the packet information
-                char debug_filename[32];
-                snprintf(debug_filename, sizeof(debug_filename), "%zu_debug.txt", conn->to_port);
-                FILE *debug_fp = fopen(debug_filename, "a");
-                if (debug_fp != NULL) {
-                    fprintf(debug_fp, "%zu %zu %zu MALICIOUS in %s\n", conn->from_port, conn->to_port, packet_id, contents);
-                    fclose(debug_fp);
-                } else {
-                    fprintf(stderr, "Cannot open debug file with name %s\n", debug_filename);
-                }
             }
-        
-
         // unlock packet id mutex
         pthread_mutex_unlock(&port_array[conn->from_port].mutex);
-
         // broadcast signal
         pthread_cond_broadcast(&port_array[conn->from_port].signal);
         }      
         buffer_len = MESSAGE_SIZE + 1; 
         memset(&buf, 0, buffer_len); // clearing buffer
-        memset(&contents, 0, buffer_len - 3 * sizeof(size_t));
-
-
+        memset(&contents, 0, buffer_len - 3 * sizeof(size_t)); // clearing contents array
     } while(1);
 
     return NULL;

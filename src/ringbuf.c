@@ -8,12 +8,6 @@
 #include <errno.h>  // For error handling
 
 
-void clear_buffer(void *buffer, size_t *buffer_len) {
-    if (buffer != NULL && buffer_len != NULL) {
-        memset(buffer, 0, *buffer_len);
-    }
-}
-
 void ringbuffer_init(rbctx_t *context, void *buffer_location, size_t buffer_size)
 {
     //  clear from begin till end 
@@ -26,9 +20,6 @@ void ringbuffer_init(rbctx_t *context, void *buffer_location, size_t buffer_size
     // Initialize mutexes and condition variables
     pthread_mutex_init(&context->mtx, NULL);
     pthread_cond_init(&context->sig, NULL);
-
-   
-
 }
 
 size_t available_space(rbctx_t *context) {
@@ -58,13 +49,15 @@ int msg_size_copy(rbctx_t *context, size_t message_len) {
     return 0; // successful process
 }
 
-// must be robust -> return 0 if the size_t 
 int msg_size_read(rbctx_t *context, size_t *message_len) {
-    if (!context || !message_len || !context->read || !context->begin || !context->end) {
-        return EINVAL;  // Validate pointers for safety.
+    // Validate pointers for safety.
+    if (!context || !message_len || !context->read || !context->begin || !context->end) 
+    {
+        return EINVAL;  
     }
-    // Validate position pointers
-    if (context->read > context->end || context->read < context->begin) {
+    // Validate position pointers for safety
+    if (context->read > context->end || context->read < context->begin) 
+    {
         return EINVAL;
     }    
 
@@ -83,10 +76,9 @@ int msg_size_read(rbctx_t *context, size_t *message_len) {
         // Safe copying with boundary checks
         if ((char*)message_len + bytes_copied < (char*)message_len + sizeof(size_t)) {
             memcpy((char*)message_len + bytes_copied, context->read, 1); // Copy one byte at a time
-
             bytes_copied++;
         } else {
-            // Handle error: buffer overflow attempt
+            // buffer overflow attempt
             break;
         }
 
@@ -107,7 +99,6 @@ int msg_size_read(rbctx_t *context, size_t *message_len) {
 
 
 size_t static is_buffer_full(rbctx_t *context, size_t msg_len) {
-    //
     u_int8_t *read = context->read;
     size_t needed_space = msg_len + sizeof(size_t);
     size_t ringbuffer_size = context->end - context->begin;
@@ -120,10 +111,8 @@ size_t static is_buffer_full(rbctx_t *context, size_t msg_len) {
         // When read is ahead of write
         free_bytes = read - context->write - 1;
     }
-    // printf("free bytes %zu \n", free_bytes);
     if (needed_space > free_bytes) return 1;
     else return 0;
-
 }
 
 /* 
@@ -131,7 +120,6 @@ size_t static is_buffer_full(rbctx_t *context, size_t msg_len) {
 • read pointer == write pointer: Der Lesepointer ist gleich dem Schreibpointer.
 • read pointer < write pointer: Der Lesepointer befindet sich vor dem Schreibpointer.
 */
-
 int is_buffer_empty(rbctx_t *context) {
     // "freezing" the state of the pointers
     uint8_t* local_read = context->read;
@@ -160,13 +148,11 @@ int ringbuffer_write(rbctx_t *context, void *message, size_t message_len)
 
     while (is_buffer_full(context, message_len)) { // buffer is still full
         int res = pthread_cond_timedwait(&context->sig, &context->mtx, &ts);
-        // pthread_mutex_unlock(&context->mutex_read);
  
         if (res == ETIMEDOUT) {
         // Handle timeout scenario
 
             pthread_mutex_unlock(&context->mtx);  // Unlock before returning
-            // printf("returning RINGBUFFER_FULL\n");
             return RINGBUFFER_FULL;
         }
 
@@ -224,8 +210,6 @@ int ringbuffer_read(rbctx_t *context, void *buffer, size_t *buffer_len)
         if (pthread_cond_timedwait(&context->sig, &context->mtx, &ts) == ETIMEDOUT) 
         {
             pthread_mutex_unlock(&context->mtx);  // Unlock mutex before returning
-            // printf("returning RINGBUFFER_EMPTY\n");
-
             return RINGBUFFER_EMPTY; 
         }
     }
