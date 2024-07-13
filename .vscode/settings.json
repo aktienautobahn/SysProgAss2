@@ -1,0 +1,12 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/Users/emilskorov/Sandbox/Uni/SysProg/HA2/build/test_unthreaded_no_wrap",
+            "binaryPath": "/Users/emilskorov/Sandbox/Uni/SysProg/HA2/build/test_unthreaded_no_wrap/test_by_file",
+            "binaryArgs": []
+        }
+    ],
+    "files.associations": {
+        "daemon.h": "c"
+    }
+}
