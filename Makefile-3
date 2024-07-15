@@ -10,8 +10,8 @@
 VERBOSE ?= 0
 N ?= 1
 THREADS ?= 1
-SANITIZE ?= 0
-ASAN_OPTIONS_ENABLED ?= 0
+SANITIZE ?= 1
+ASAN_OPTIONS_ENABLED ?= 1
 
 # Directories
 SRC_DIR = src
@@ -44,7 +44,11 @@ all: $(TEST_TARGET)
 
 # Rule for compiling test source files into test targets
 $(BUILD_DIR)/%: $(TEST_DIR)/%.c $(OBJS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(OBJS) $< -o $@
+ifeq ($(ASAN_OPTIONS_ENABLED), 1)
+    ASAN_OPTIONS=detect_leaks=1 $(CC) $(CFLAGS) $(OBJS) $< -o $@
+else
+    $(CC) $(CFLAGS) $(OBJS) $< -o $@
+endif
 
 # Rule for compiling source files into object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
@@ -54,7 +58,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# Create build subdirectories if they don't exist
+# Create build subsdirectories if they don't exist
 $(foreach dir, $(TEST_SUBDIRS), $(shell mkdir -p $(patsubst $(TEST_DIR)/%, $(BUILD_DIR)/%, $(dir))))
 
 # Test execution rule
@@ -202,18 +206,18 @@ test_daemon: $(BUILD_DIR)/test_daemon/test
 	$(MAKE) test_exec TEST_FILE=$(BUILD_DIR)/test_daemon/test
 
 # Rule to run tests repeatedly for a specific test
-test_repeat:
+test_repeatedly: $(BUILD_DIR)/$(TEST)
 	@rm -f .failed_count .test_results .total_failed; \
 	start_time=$$(date +%s); \
 	echo " "; \
 	echo "Testing began at: $$(date)"; \
 	for i in $(shell seq 1 $(N)); do \
-		$(MAKE) test_exec TEST_FILE=$(BUILD_DIR)/$(TEST) THREADS=$(THREADS) VERBOSE=$(VERBOSE); \
-		current_failed=$$(cat .failed_count 2>/dev/null || echo 0); \
+		$(MAKE) test_exec TEST_FILE=$(TEST) THREADS=$(THREADS) VERBOSE=$(VERBOSE); \
+		current_failed=$$(cat .failed_count); \
 		echo "Iteration $$i: $$current_failed failed"; \
 		echo $$current_failed >> .total_failed; \
 	done; \
-	total_failed=$$(awk '{s+=$$1} END {print s}' .total_failed 2>/dev/null || echo 0); \
+	total_failed=$$(awk '{s+=$$1} END {print s}'); \
 	end_time=$$(date +%s); \
 	elapsed_time=$$((end_time - start_time)); \
 	echo " "; \
@@ -240,7 +244,6 @@ help:
 	@echo "  \033[1;33mmake \033[1;36mpack\033[0m                     - Pack source files into submission.zip"
 	@echo "  \033[1;33mmake \033[1;32mtest_all\033[0m                 - Run all tests"
 	@echo "  \033[1;33mmake \033[1;32mtest_all_repeat\033[0m          - Run all tests repeatedly"
-	@echo "  \033[1;33mmake \033[1;32mtest_repeat\033[0m              - Run a specific test repeatedly - \033[1;31m'make help_test_repeat'\033[0m for more information"
 	@echo "  \033[1;33mmake \033[1;32mtest_utnowrap_byfile\033[0m     - Run unthreaded no wrap by file test"
 	@echo "  \033[1;33mmake \033[1;32mtest_utwrap_byfile\033[0m       - Run unthreaded wrap by file test"
 	@echo "  \033[1;33mmake \033[1;32mtest_utnowrap_complex\033[0m    - Run unthreaded no wrap complex test"
@@ -258,8 +261,8 @@ help:
 	@echo "  \033[1;33mN\033[0m=\033[1;32m<number>\033[0m                    - Number of repetitions for test_all_repeat"
 	@echo "  \033[1;33mTHREADS\033[0m=\033[1;32m<number>\033[0m              - Number of threads for parallel execution"
 	@echo "  \033[1;33mTEST\033[0m=\033[1;32m<test>\033[0m                   - Test to run repeatedly - Can only be used with test_all_repeat"
-	@echo "  \033[1;33mSANITIZE\033[0m=\033[1;32m1\033[0m/\033[1;34m0\033[0m                  - Enable address sanitizer flag (\033[1;42m-fsanitize=address\033[0m) \033[1;31m1\033[0m=enabled, \033[1;34m0\033[0m=disabled - default is disabled"
-	@echo "  \033[1;33mASAN_OPTIONS_ENABLED\033[0m=\033[1;32m1\033[0m/\033[1;34m0\033[0m      - Enable \033[1;41mASAN_OPTIONS=detect_leaks=1\033[0m flag \033[1;31m1\033[0m=enabled, \033[1;34m0\033[0m=disabled - default is disabled"
+	@echo "  \033[1;33mSANITIZE\033[0m=\033[1;32m1\033[0m/\033[1;34m0\033[0m                  - Enable address sanitizer flag (\033[1;42m-fsanitize=address\033[0m) \033[1;31m1\033[0m=enabled, \033[1;34m0\033[0m=disabled"
+	@echo "  \033[1;33mASAN_OPTIONS_ENABLED\033[0m=\033[1;32m1\033[0m/\033[1;34m0\033[0m      - Enable \033[1;41mASAN_OPTIONS=detect_leaks=1\033[0m flag \033[1;31m1\033[0m=enabled, \033[1;34m0\033[0m=disabled"
 	@echo ""
 
 # Parallel-specific help command
@@ -290,19 +293,6 @@ help_parallel:
 	@echo "apt-cyg install parallel"
 	@echo ""
 
-# test_repeat help command
-help_test_repeat:
-	@echo ""
-	@echo "\033[1;31mUsage:\033[0m"
-	@echo "> \033[1;33mmake \033[1;32mtest_repeat\033[0m \033[1;33mTEST\033[0m=\033[1;32m<test>\033[0m \033[1;33mN\033[0m=\033[1;32m<number>\033[0m \033[1;33mTHREADS\033[0m=\033[1;32m<number>\033[0m \033[1;33mVERBOSE\033[0m=\033[1;32m1\033[0m/\033[1;34m0\033[0m"
-	@echo ""
-	@echo "\033[1;31mExample Usage:\033[0m"
-	@echo "> \033[1;33mmake \033[1;32mtest_repeat\033[0m \033[1;33mTEST\033[0m=\033[1;32mtest_unthreaded_no_wrap/test_by_file\033[0m \033[1;33mN\033[0m=\033[1;32m10\033[0m \033[1;33mTHREADS\033[0m=\033[1;32m4\033[0m \033[1;33mVERBOSE\033[0m=\033[1;32m1\033[0m"
-	@echo ""
-	@echo "We pass the 'TEST' argument the test name - can be found under '/test' dir or '/build' dir if built - without the '.c' extension"
-	@echo "Then after '/' we pass the test file name"
-	@echo "The file needs to be compiled before running the test"
-
 # Default rule for undefined targets
 .DEFAULT:
 	@echo ""
@@ -311,7 +301,7 @@ help_test_repeat:
 	@echo ""
 
 # Define phony targets
-.PHONY: all clean pack help help_parallel test test_all test_all_repeat test_repeat test_exec test_utnowrap_byfile test_utwrap_byfile test_utnowrap_complex test_utwrap_complex test_utnowrap_simple test_utwrap_simple test_threaded test_unit_read test_unit_write test_daemon
+.PHONY: all clean pack help help_parallel test test_all_repeat test_exec test_utnowrap_byfile test_utwrap_byfile test_utnowrap_complex test_utwrap_complex test_utnowrap_simple test_utwrap_simple test_threaded test_unit_read test_unit_write test_daemon
 
 # Clean up
 clean:
