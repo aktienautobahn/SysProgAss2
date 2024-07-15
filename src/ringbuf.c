@@ -271,4 +271,7 @@ void ringbuffer_destroy(rbctx_t *context)
     context->end = NULL;    
     context->read = NULL;    
     context->write = NULL;
+    // destroy mutex and signal
+    pthread_mutex_destroy(&context->mtx);
+    pthread_cond_destroy(&context->sig);
 }
