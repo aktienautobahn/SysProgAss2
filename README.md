@@ -11,6 +11,7 @@ This project consists of two main components: a simple daemon for processing net
 ## Files
 
 - `daemon.h`: Contains the definition of the `simpledaemon` function and the `connection_t` structure.
+- `daemon.c`: Contains reader and writer thread-safe functions as well as daemon for threads management.
 - `ringbuf.h`: Contains the definitions and function declarations for the ring buffer.
 - `ringbuf.c`: Implements the ring buffer functions.
 
