@@ -7,6 +7,9 @@
         }
     ],
     "files.associations": {
-        "daemon.h": "c"
+        "daemon.h": "c",
+        "__config": "c",
+        "_stdio.h": "c",
+        "string.h": "c"
     }
 }
