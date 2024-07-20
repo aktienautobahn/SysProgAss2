@@ -1,4 +1,9 @@
-build/
-.DS_Store
+# Ignore .vscode directory and its contents
 .vscode/
 .vscode
+
+# Ignore build directory and its contents
+build/
+
+# Ignore .DS_Store (common on macOS)
+.DS_Store
