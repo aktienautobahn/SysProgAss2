@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 # Simple Daemon and Ring Buffer
 
@@ -8,14 +7,6 @@ This basic implementation still has a limitation on parallel accessing. Only one
 My own code inside src/* is highlighted.
 
 
-=======
-# SysProg-HA2-v.1.5
-
-This project was an assignment in context of Thread-safe Low-Level Operating Systems Programming.
-
-# Simple Daemon and Ring Buffer
-
->>>>>>> github/main
 ## Overview
 
 This project consists of two main components: a simple daemon for processing network connections and a thread-safe ring buffer implementation. The simple daemon simulates network traffic and processes it using multiple threads, while the ring buffer handles data in a lock-free, thread-safe manner.
