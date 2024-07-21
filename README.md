@@ -1,8 +1,11 @@
-# SysProg-HA2-v.1.5
-
-This project was an assignment in context of Thread-safe Low-Level Operating Systems Programming.
 
 # Simple Daemon and Ring Buffer
+
+This project was an assignment in context of Thread-safe Low-Level Operating Systems Programming. The idea is based around producer consumer problem (writer worker threads & reader worker threads) that utilizes limited in size but circular (after end comes begin) logic. 
+![Concept](image.png)
+This basic implementation still has a limitation on parallel accessing. Only one worker at a time can access the ring buffer.
+My own code inside src/* that is marked.
+
 
 ## Overview
 
