@@ -1,0 +1,31 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     'build/test_unthreaded_no_wrap/test_complex'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _write_packets, symObjAddr: 0x0, symBinAddr: 0x1000019E8, symSize: 0x1D8 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _port_array, symBinAddr: 0x10000A040, symSize: 0x0 }
+  - { offsetInCU: 0x14C, offset: 0x14C, size: 0x8, addend: 0x0, symName: _file_mutex, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x29D, offset: 0x29D, size: 0x8, addend: 0x0, symName: _write_packets, symObjAddr: 0x0, symBinAddr: 0x1000019E8, symSize: 0x1D8 }
+  - { offsetInCU: 0x355, offset: 0x355, size: 0x8, addend: 0x0, symName: _initialize_file_mutexes, symObjAddr: 0x1D8, symBinAddr: 0x100001BC0, symSize: 0x60 }
+  - { offsetInCU: 0x387, offset: 0x387, size: 0x8, addend: 0x0, symName: _initialize_port_array, symObjAddr: 0x238, symBinAddr: 0x100001C20, symSize: 0xAC }
+  - { offsetInCU: 0x3B9, offset: 0x3B9, size: 0x8, addend: 0x0, symName: _malicious_filter, symObjAddr: 0x2E4, symBinAddr: 0x100001CCC, symSize: 0xDC }
+  - { offsetInCU: 0x435, offset: 0x435, size: 0x8, addend: 0x0, symName: _port_filter, symObjAddr: 0x3C0, symBinAddr: 0x100001DA8, symSize: 0x88 }
+  - { offsetInCU: 0x46B, offset: 0x46B, size: 0x8, addend: 0x0, symName: _firewall, symObjAddr: 0x448, symBinAddr: 0x100001E30, symSize: 0x84 }
+  - { offsetInCU: 0x4AF, offset: 0x4AF, size: 0x8, addend: 0x0, symName: _forwarding, symObjAddr: 0x4CC, symBinAddr: 0x100001EB4, symSize: 0x170 }
+  - { offsetInCU: 0x51D, offset: 0x51D, size: 0x8, addend: 0x0, symName: _read_packets, symObjAddr: 0x63C, symBinAddr: 0x100002024, symSize: 0x4B8 }
+  - { offsetInCU: 0x5DA, offset: 0x5DA, size: 0x8, addend: 0x0, symName: _simpledaemon, symObjAddr: 0xAF4, symBinAddr: 0x1000024DC, symSize: 0x560 }
+  - { offsetInCU: 0x26, offset: 0xAD4, size: 0x8, addend: 0x0, symName: _ringbuffer_init, symObjAddr: 0x0, symBinAddr: 0x100002A3C, symSize: 0x80 }
+  - { offsetInCU: 0x4D, offset: 0xAFB, size: 0x8, addend: 0x0, symName: _ringbuffer_init, symObjAddr: 0x0, symBinAddr: 0x100002A3C, symSize: 0x80 }
+  - { offsetInCU: 0x8D, offset: 0xB3B, size: 0x8, addend: 0x0, symName: _available_space, symObjAddr: 0x80, symBinAddr: 0x100002ABC, symSize: 0x84 }
+  - { offsetInCU: 0xB5, offset: 0xB63, size: 0x8, addend: 0x0, symName: _msg_size_copy, symObjAddr: 0x104, symBinAddr: 0x100002B40, symSize: 0x100 }
+  - { offsetInCU: 0x123, offset: 0xBD1, size: 0x8, addend: 0x0, symName: _msg_size_read, symObjAddr: 0x204, symBinAddr: 0x100002C40, symSize: 0x240 }
+  - { offsetInCU: 0x191, offset: 0xC3F, size: 0x8, addend: 0x0, symName: _is_buffer_empty, symObjAddr: 0x444, symBinAddr: 0x100002E80, symSize: 0xD8 }
+  - { offsetInCU: 0x20D, offset: 0xCBB, size: 0x8, addend: 0x0, symName: _ringbuffer_write, symObjAddr: 0x51C, symBinAddr: 0x100002F58, symSize: 0x1EC }
+  - { offsetInCU: 0x289, offset: 0xD37, size: 0x8, addend: 0x0, symName: _is_buffer_full, symObjAddr: 0x708, symBinAddr: 0x100003144, symSize: 0xD8 }
+  - { offsetInCU: 0x2F7, offset: 0xDA5, size: 0x8, addend: 0x0, symName: _ringbuffer_read, symObjAddr: 0x7E0, symBinAddr: 0x10000321C, symSize: 0x2BC }
+  - { offsetInCU: 0x373, offset: 0xE21, size: 0x8, addend: 0x0, symName: _ringbuffer_destroy, symObjAddr: 0xA9C, symBinAddr: 0x1000034D8, symSize: 0x54 }
+  - { offsetInCU: 0x26, offset: 0xFD4, size: 0x8, addend: 0x0, symName: _write_and_check, symObjAddr: 0x0, symBinAddr: 0x10000352C, symSize: 0x68 }
+  - { offsetInCU: 0x41, offset: 0xFEF, size: 0x8, addend: 0x0, symName: _write_and_check, symObjAddr: 0x0, symBinAddr: 0x10000352C, symSize: 0x68 }
+  - { offsetInCU: 0x85, offset: 0x1033, size: 0x8, addend: 0x0, symName: _read_and_check, symObjAddr: 0x68, symBinAddr: 0x100003594, symSize: 0x248 }
+  - { offsetInCU: 0xF2, offset: 0x10A0, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x2B0, symBinAddr: 0x1000037DC, symSize: 0x39C }
+...
